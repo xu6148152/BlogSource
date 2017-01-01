@@ -1,0 +1,597 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="导言WindowManager是整个绘制系统的核心桥梁。一般通过getSystemService(Context.WindowService)可以获取。
+123456registerService(Context.WINDOW_SERVICE, WindowManager.class,                new CachedServiceFetcher&amp;lt;WindowManager">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WindowManager分析">
+<meta property="og:url" content="http://xu6148152.github.io/2016/09/16/WindowManager分析/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="导言WindowManager是整个绘制系统的核心桥梁。一般通过getSystemService(Context.WindowService)可以获取。
+123456registerService(Context.WINDOW_SERVICE, WindowManager.class,                new CachedServiceFetcher&amp;lt;WindowManager">
+<meta property="og:image" content="http://xu6148152.github.io/./WindowManager.png">
+<meta property="og:updated_time" content="2016-09-17T06:03:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WindowManager分析">
+<meta name="twitter:description" content="导言WindowManager是整个绘制系统的核心桥梁。一般通过getSystemService(Context.WindowService)可以获取。
+123456registerService(Context.WINDOW_SERVICE, WindowManager.class,                new CachedServiceFetcher&amp;lt;WindowManager">
+<meta name="twitter:image" content="http://xu6148152.github.io/./WindowManager.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://xu6148152.github.io/2016/09/16/WindowManager分析/"/>
+
+
+  <title> WindowManager分析 | Blog </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                WindowManager分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">Veröffentlicht am</span>
+            <time itemprop="dateCreated" datetime="2016-09-16T16:45:09+08:00" content="2016-09-16">
+              2016-09-16
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="导言"><a href="#导言" class="headerlink" title="导言"></a>导言</h3><p><code>WindowManager</code>是整个绘制系统的核心桥梁。一般通过<code>getSystemService(Context.WindowService)</code>可以获取。</p>
+<p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">registerService(Context.WINDOW_SERVICE, WindowManager.class,</span><br><span class="line">                <span class="keyword">new</span> CachedServiceFetcher&lt;WindowManager&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> WindowManager <span class="title">createService</span><span class="params">(ContextImpl ctx)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> WindowManagerImpl(ctx.getDisplay());</span><br><span class="line">            &#125;&#125;);</span><br></pre></td></tr></table></figure>
+</p>
+<h4 id="WindowManagerImpl"><a href="#WindowManagerImpl" class="headerlink" title="WindowManagerImpl"></a>WindowManagerImpl</h4><p>通过代码可以发现<code>WindowManagerImpl</code>的核心实现都在<code>WindowManagerGlobal</code></p>
+<h4 id="WindowManagerGlobal"><a href="#WindowManagerGlobal" class="headerlink" title="WindowManagerGlobal"></a>WindowManagerGlobal</h4><p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addView</span><span class="params">(View view, ViewGroup.LayoutParams params,</span><br><span class="line">            Display display, Window parentWindow)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"view must not be null"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (display == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"display must not be null"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!(params <span class="keyword">instanceof</span> WindowManager.LayoutParams)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Params must be WindowManager.LayoutParams"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> WindowManager.LayoutParams wparams = (WindowManager.LayoutParams) params;</span><br><span class="line">        <span class="keyword">if</span> (parentWindow != <span class="keyword">null</span>) &#123;</span><br><span class="line">            parentWindow.adjustLayoutParamsForSubWindow(wparams);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// If there's no parent, then hardware acceleration for this view is</span></span><br><span class="line">            <span class="comment">// set from the application's hardware acceleration setting.</span></span><br><span class="line">            <span class="keyword">final</span> Context context = view.getContext();</span><br><span class="line">            <span class="keyword">if</span> (context != <span class="keyword">null</span></span><br><span class="line">                    &amp;&amp; (context.getApplicationInfo().flags</span><br><span class="line">                            &amp; ApplicationInfo.FLAG_HARDWARE_ACCELERATED) != <span class="number">0</span>) &#123;</span><br><span class="line">                wparams.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ViewRootImpl root;</span><br><span class="line">        View panelParentView = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">synchronized</span> (mLock) &#123;</span><br><span class="line">            <span class="comment">// Start watching for system property changes.</span></span><br><span class="line">            <span class="keyword">if</span> (mSystemPropertyUpdater == <span class="keyword">null</span>) &#123;</span><br><span class="line">                mSystemPropertyUpdater = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">synchronized</span> (mLock) &#123;</span><br><span class="line">                            <span class="keyword">for</span> (<span class="keyword">int</span> i = mRoots.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">                                mRoots.get(i).loadSystemProperties();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;;</span><br><span class="line">                SystemProperties.addChangeCallback(mSystemPropertyUpdater);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> index = findViewLocked(view, <span class="keyword">false</span>);</span><br><span class="line">            <span class="keyword">if</span> (index &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mDyingViews.contains(view)) &#123;</span><br><span class="line">                    <span class="comment">// Don't wait for MSG_DIE to make it's way through root's queue.</span></span><br><span class="line">                    mRoots.get(index).doDie();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"View "</span> + view</span><br><span class="line">                            + <span class="string">" has already been added to the window manager."</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// The previous removeView() had not completed executing. Now it has.</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// If this is a panel window, then find the window it is being</span></span><br><span class="line">            <span class="comment">// attached to for future reference.</span></span><br><span class="line">            <span class="keyword">if</span> (wparams.type &gt;= WindowManager.LayoutParams.FIRST_SUB_WINDOW &amp;&amp;</span><br><span class="line">                    wparams.type &lt;= WindowManager.LayoutParams.LAST_SUB_WINDOW) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> count = mViews.size();</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (mRoots.get(i).mWindow.asBinder() == wparams.token) &#123;</span><br><span class="line">                        panelParentView = mViews.get(i);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            root = <span class="keyword">new</span> ViewRootImpl(view.getContext(), display);</span><br><span class="line"></span><br><span class="line">            view.setLayoutParams(wparams);</span><br><span class="line"></span><br><span class="line">            mViews.add(view);</span><br><span class="line">            mRoots.add(root);</span><br><span class="line">            mParams.add(wparams);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// do this last because it fires off messages to start doing things</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            root.setView(view, wparams, panelParentView);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RuntimeException e) &#123;</span><br><span class="line">            <span class="comment">// BadTokenException or InvalidDisplayException, clean up.</span></span><br><span class="line">            <span class="keyword">synchronized</span> (mLock) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">int</span> index = findViewLocked(view, <span class="keyword">false</span>);</span><br><span class="line">                <span class="keyword">if</span> (index &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                    removeViewLocked(index, <span class="keyword">true</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>可以发现<code>addView</code>里面主要用到<code>ViewRootImpl</code>来添加视图</p>
+<h4 id="ViewRootImpl"><a href="#ViewRootImpl" class="headerlink" title="ViewRootImpl"></a>ViewRootImpl</h4><p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ViewRootImpl</span><span class="params">(Context context, Display display)</span> </span>&#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">        mWindowSession = WindowManagerGlobal.getWindowSession();</span><br><span class="line">        mDisplay = display;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWindowSession <span class="title">getWindowSession</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (WindowManagerGlobal.class) &#123;</span><br><span class="line">            <span class="keyword">if</span> (sWindowSession == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    InputMethodManager imm = InputMethodManager.getInstance();</span><br><span class="line">                    IWindowManager windowManager = getWindowManagerService();</span><br><span class="line">                    sWindowSession = windowManager.openSession(</span><br><span class="line">                            <span class="keyword">new</span> IWindowSessionCallback.Stub() &#123;</span><br><span class="line">                                <span class="meta">@Override</span></span><br><span class="line">                                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAnimatorScaleChanged</span><span class="params">(<span class="keyword">float</span> scale)</span> </span>&#123;</span><br><span class="line">                                    ValueAnimator.setDurationScale(scale);</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;,</span><br><span class="line">                            imm.getClient(), imm.getInputContext());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    Log.e(TAG, <span class="string">"Failed to open window session"</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sWindowSession;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IWindowManager <span class="title">getWindowManagerService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (WindowManagerGlobal.class) &#123;</span><br><span class="line">            <span class="keyword">if</span> (sWindowManagerService == <span class="keyword">null</span>) &#123;</span><br><span class="line">                sWindowManagerService = IWindowManager.Stub.asInterface(</span><br><span class="line">                        ServiceManager.getService(<span class="string">"window"</span>));</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    sWindowManagerService = getWindowManagerService();</span><br><span class="line">                    ValueAnimator.setDurationScale(sWindowManagerService.getCurrentAnimatorScale());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">                    Log.e(TAG, <span class="string">"Failed to get WindowManagerService, cannot set animator scale"</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sWindowManagerService;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>通过<code>AIDL</code>获取<code>WindowManagerService</code>这时<code>Framework</code>与<code>Native</code>建立起连接了。之后<code>ViewRootImpl</code>会调用<code>setView</code>。</p>
+<p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestLayout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!mHandlingLayoutInLayoutRequest) &#123;</span><br><span class="line">            checkThread();</span><br><span class="line">            mLayoutRequested = <span class="keyword">true</span>;</span><br><span class="line">            scheduleTraversals();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>要求系统开始布局</p>
+<p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">scheduleTraversals</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!mTraversalScheduled) &#123;</span><br><span class="line">            mTraversalScheduled = <span class="keyword">true</span>;</span><br><span class="line">            mTraversalBarrier = mHandler.getLooper().getQueue().postSyncBarrier();</span><br><span class="line">            mChoreographer.postCallback(</span><br><span class="line">                    Choreographer.CALLBACK_TRAVERSAL, mTraversalRunnable, <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">if</span> (!mUnbufferedInputDispatch) &#123;</span><br><span class="line">                scheduleConsumeBatchedInput();</span><br><span class="line">            &#125;</span><br><span class="line">            notifyRendererOfFramePending();</span><br><span class="line">            pokeDrawLockIfNeeded();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>通过<code>Choreographer</code>发送绘制命令<code>CALLBACK_TRAVERSAL</code>要求系统开始绘制</p>
+<p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doTraversal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mTraversalScheduled) &#123;</span><br><span class="line">            mTraversalScheduled = <span class="keyword">false</span>;</span><br><span class="line">            mHandler.getLooper().getQueue().removeSyncBarrier(mTraversalBarrier);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mProfile) &#123;</span><br><span class="line">                Debug.startMethodTracing(<span class="string">"ViewAncestor"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">			<span class="comment">//绘制所有View节点	</span></span><br><span class="line">            performTraversals();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mProfile) &#123;</span><br><span class="line">                Debug.stopMethodTracing();</span><br><span class="line">                mProfile = <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<h4 id="performMeasure"><a href="#performMeasure" class="headerlink" title="performMeasure"></a>performMeasure</h4><p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (mWidth != frame.width() || mHeight != frame.height()) &#123;</span><br><span class="line">    mWidth = frame.width();</span><br><span class="line">    mHeight = frame.height();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> childWidthMeasureSpec = getRootMeasureSpec(mWidth, lp.width);</span><br><span class="line"><span class="keyword">int</span> childHeightMeasureSpec = getRootMeasureSpec(mHeight, lp.height);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Ask host how big it wants to be</span></span><br><span class="line">performMeasure(childWidthMeasureSpec, childHeightMeasureSpec);</span><br><span class="line">                    </span><br><span class="line">                    </span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getRootMeasureSpec</span><span class="params">(<span class="keyword">int</span> windowSize, <span class="keyword">int</span> rootDimension)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> measureSpec;</span><br><span class="line">        <span class="keyword">switch</span> (rootDimension) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> ViewGroup.LayoutParams.MATCH_PARENT:</span><br><span class="line">            <span class="comment">// Window can't resize. Force root view to be windowSize.</span></span><br><span class="line">            measureSpec = MeasureSpec.makeMeasureSpec(windowSize, MeasureSpec.EXACTLY);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> ViewGroup.LayoutParams.WRAP_CONTENT:</span><br><span class="line">            <span class="comment">// Window can resize. Set max size for root view.</span></span><br><span class="line">            measureSpec = MeasureSpec.makeMeasureSpec(windowSize, MeasureSpec.AT_MOST);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// Window wants to be an exact size. Force root view to be that size.</span></span><br><span class="line">            measureSpec = MeasureSpec.makeMeasureSpec(rootDimension, MeasureSpec.EXACTLY);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> measureSpec;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p><code>performMeasure</code>会调用<code>view.measure()</code>里面会去调用<code>onMeasure</code>，这里会去真正的做测量操作</p>
+<h4 id="performLayout"><a href="#performLayout" class="headerlink" title="performLayout"></a>performLayout</h4><p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">            host.layout(<span class="number">0</span>, <span class="number">0</span>, host.getMeasuredWidth(), host.getMeasuredHeight());</span><br><span class="line"></span><br><span class="line">            mInLayout = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">int</span> numViewsRequestingLayout = mLayoutRequesters.size();</span><br><span class="line">            <span class="keyword">if</span> (numViewsRequestingLayout &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// requestLayout() was called during layout.</span></span><br><span class="line">                <span class="comment">// If no layout-request flags are set on the requesting views, there is no problem.</span></span><br><span class="line">                <span class="comment">// If some requests are still pending, then we need to clear those flags and do</span></span><br><span class="line">                <span class="comment">// a full request/measure/layout pass to handle this situation.</span></span><br><span class="line">                ArrayList&lt;View&gt; validLayoutRequesters = getValidLayoutRequesters(mLayoutRequesters,</span><br><span class="line">                        <span class="keyword">false</span>);</span><br><span class="line">                <span class="keyword">if</span> (validLayoutRequesters != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// Set this flag to indicate that any further requests are happening during</span></span><br><span class="line">                    <span class="comment">// the second pass, which may result in posting those requests to the next</span></span><br><span class="line">                    <span class="comment">// frame instead</span></span><br><span class="line">                    mHandlingLayoutInLayoutRequest = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// Process fresh layout requests, then measure and layout</span></span><br><span class="line">                    <span class="keyword">int</span> numValidRequests = validLayoutRequesters.size();</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numValidRequests; ++i) &#123;</span><br><span class="line">                        <span class="keyword">final</span> View view = validLayoutRequesters.get(i);</span><br><span class="line">                        Log.w(<span class="string">"View"</span>, <span class="string">"requestLayout() improperly called by "</span> + view +</span><br><span class="line">                                <span class="string">" during layout: running second layout pass"</span>);</span><br><span class="line">                        view.requestLayout();</span><br><span class="line">                    &#125;</span><br><span class="line">                    measureHierarchy(host, lp, mView.getContext().getResources(),</span><br><span class="line">                            desiredWindowWidth, desiredWindowHeight);</span><br><span class="line">                    mInLayout = <span class="keyword">true</span>;</span><br><span class="line">                    host.layout(<span class="number">0</span>, <span class="number">0</span>, host.getMeasuredWidth(), host.getMeasuredHeight());</span><br><span class="line"></span><br><span class="line">                    mHandlingLayoutInLayoutRequest = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// Check the valid requests again, this time without checking/clearing the</span></span><br><span class="line">                    <span class="comment">// layout flags, since requests happening during the second pass get noop'd</span></span><br><span class="line">                    validLayoutRequesters = getValidLayoutRequesters(mLayoutRequesters, <span class="keyword">true</span>);</span><br><span class="line">                    <span class="keyword">if</span> (validLayoutRequesters != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">final</span> ArrayList&lt;View&gt; finalRequesters = validLayoutRequesters;</span><br><span class="line">                        <span class="comment">// Post second-pass requests to the next frame</span></span><br><span class="line">                        getRunQueue().post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                            <span class="meta">@Override</span></span><br><span class="line">                            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                                <span class="keyword">int</span> numValidRequests = finalRequesters.size();</span><br><span class="line">                                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numValidRequests; ++i) &#123;</span><br><span class="line">                                    <span class="keyword">final</span> View view = finalRequesters.get(i);</span><br><span class="line">                                    Log.w(<span class="string">"View"</span>, <span class="string">"requestLayout() improperly called by "</span> + view +</span><br><span class="line">                                            <span class="string">" during second layout pass: posting in next frame"</span>);</span><br><span class="line">                                    view.requestLayout();</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            Trace.traceEnd(Trace.TRACE_TAG_VIEW);</span><br><span class="line">        &#125;</span><br><span class="line">        mInLayout = <span class="keyword">false</span>;</span><br></pre></td></tr></table></figure>
+</p>
+<p>先进行布局，检查需要布局的数目，检查这些布局请求是否合理,不合理重新布局。</p>
+<h4 id="performDraw"><a href="#performDraw" class="headerlink" title="performDraw"></a>performDraw</h4><p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> cancelDraw = mAttachInfo.mTreeObserver.dispatchOnPreDraw() ||</span><br><span class="line">                viewVisibility != View.VISIBLE;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!cancelDraw &amp;&amp; !newSurface) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!skipDraw || mReportNextDraw) &#123;</span><br><span class="line">                <span class="keyword">if</span> (mPendingTransitions != <span class="keyword">null</span> &amp;&amp; mPendingTransitions.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mPendingTransitions.size(); ++i) &#123;</span><br><span class="line">                        mPendingTransitions.get(i).startChangingAnimations();</span><br><span class="line">                    &#125;</span><br><span class="line">                    mPendingTransitions.clear();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                performDraw();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (viewVisibility == View.VISIBLE) &#123;</span><br><span class="line">                <span class="comment">// Try again</span></span><br><span class="line">                scheduleTraversals();</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mPendingTransitions != <span class="keyword">null</span> &amp;&amp; mPendingTransitions.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mPendingTransitions.size(); ++i) &#123;</span><br><span class="line">                    mPendingTransitions.get(i).endChangingAnimations();</span><br><span class="line">                &#125;</span><br><span class="line">                mPendingTransitions.clear();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>判断此次绘制是否取消或者是新的页面。</p>
+<p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">performDraw</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mAttachInfo.mDisplayState == Display.STATE_OFF &amp;&amp; !mReportNextDraw) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> fullRedrawNeeded = mFullRedrawNeeded;</span><br><span class="line">        mFullRedrawNeeded = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        mIsDrawing = <span class="keyword">true</span>;</span><br><span class="line">        Trace.traceBegin(Trace.TRACE_TAG_VIEW, <span class="string">"draw"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            draw(fullRedrawNeeded);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            mIsDrawing = <span class="keyword">false</span>;</span><br><span class="line">            Trace.traceEnd(Trace.TRACE_TAG_VIEW);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// For whatever reason we didn't create a HardwareRenderer, end any</span></span><br><span class="line">        <span class="comment">// hardware animations that are now dangling</span></span><br><span class="line">        <span class="keyword">if</span> (mAttachInfo.mPendingAnimatingRenderNodes != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> count = mAttachInfo.mPendingAnimatingRenderNodes.size();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">                mAttachInfo.mPendingAnimatingRenderNodes.get(i).endAllAnimators();</span><br><span class="line">            &#125;</span><br><span class="line">            mAttachInfo.mPendingAnimatingRenderNodes.clear();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (mReportNextDraw) &#123;</span><br><span class="line">            mReportNextDraw = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">if</span> (mAttachInfo.mHardwareRenderer != <span class="keyword">null</span>) &#123;</span><br><span class="line">                mAttachInfo.mHardwareRenderer.fence();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (LOCAL_LOGV) &#123;</span><br><span class="line">                Log.v(TAG, <span class="string">"FINISHED DRAWING: "</span> + mWindowAttributes.getTitle());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (mSurfaceHolder != <span class="keyword">null</span> &amp;&amp; mSurface.isValid()) &#123;</span><br><span class="line">                mSurfaceHolderCallback.surfaceRedrawNeeded(mSurfaceHolder);</span><br><span class="line">                SurfaceHolder.Callback callbacks[] = mSurfaceHolder.getCallbacks();</span><br><span class="line">                <span class="keyword">if</span> (callbacks != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (SurfaceHolder.Callback c : callbacks) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (c <span class="keyword">instanceof</span> SurfaceHolder.Callback2) &#123;</span><br><span class="line">                            ((SurfaceHolder.Callback2)c).surfaceRedrawNeeded(</span><br><span class="line">                                    mSurfaceHolder);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                mWindowSession.finishDrawing(mWindow);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">调用draw()方法</span><br><span class="line">如果开启了硬件加速，使用ThreadedRender.draw绘制，否则采用传统canvas绘制</span><br></pre></td></tr></table></figure>
+</p>
+<p>cavas绘制</p>
+<p><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">class ANDROID_API Canvas</span><br><span class="line"></span><br><span class="line">底层采用Skia引擎来绘制</span><br><span class="line"></span><br><span class="line">DrawFrameTask</span><br><span class="line"></span><br><span class="line">void DrawFrameTask::run() &#123;</span><br><span class="line">    ATRACE_NAME("DrawFrame");</span><br><span class="line"></span><br><span class="line">    bool canUnblockUiThread;</span><br><span class="line">    bool canDrawThisFrame;</span><br><span class="line">    &#123;</span><br><span class="line">        TreeInfo info(TreeInfo::MODE_FULL, mRenderThread-&gt;renderState());</span><br><span class="line">        canUnblockUiThread = syncFrameState(info);</span><br><span class="line">        canDrawThisFrame = info.out.canDrawThisFrame;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Grab a copy of everything we need</span><br><span class="line">    CanvasContext* context = mContext;</span><br><span class="line"></span><br><span class="line">    // From this point on anything in "this" is *UNSAFE TO ACCESS*</span><br><span class="line">    if (canUnblockUiThread) &#123;</span><br><span class="line">        unblockUiThread();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (CC_LIKELY(canDrawThisFrame)) &#123;</span><br><span class="line">        context-&gt;draw();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (!canUnblockUiThread) &#123;</span><br><span class="line">        unblockUiThread();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">CanvasContext</span><br><span class="line"></span><br><span class="line">void CanvasContext::draw() &#123;</span><br><span class="line">    LOG_ALWAYS_FATAL_IF(!mCanvas || mEglSurface == EGL_NO_SURFACE,</span><br><span class="line">            "drawRenderNode called on a context with no canvas or surface!");</span><br><span class="line"></span><br><span class="line">    SkRect dirty;</span><br><span class="line">    mDamageAccumulator.finish(&amp;dirty);</span><br><span class="line"></span><br><span class="line">    // TODO: Re-enable after figuring out cause of b/22592975</span><br><span class="line">//    if (dirty.isEmpty() &amp;&amp; Properties::skipEmptyFrames) &#123;</span><br><span class="line">//        mCurrentFrameInfo-&gt;addFlag(FrameInfoFlags::SkippedFrame);</span><br><span class="line">//        return;</span><br><span class="line">//    &#125;</span><br><span class="line"></span><br><span class="line">    mCurrentFrameInfo-&gt;markIssueDrawCommandsStart();</span><br><span class="line"></span><br><span class="line">    EGLint width, height;</span><br><span class="line">    mEglManager.beginFrame(mEglSurface, &amp;width, &amp;height);</span><br><span class="line">    if (width != mCanvas-&gt;getViewportWidth() || height != mCanvas-&gt;getViewportHeight()) &#123;</span><br><span class="line">        mCanvas-&gt;setViewport(width, height);</span><br><span class="line">        dirty.setEmpty();</span><br><span class="line">    &#125; else if (!mBufferPreserved || mHaveNewSurface) &#123;</span><br><span class="line">        dirty.setEmpty();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        if (!dirty.isEmpty() &amp;&amp; !dirty.intersect(0, 0, width, height)) &#123;</span><br><span class="line">            ALOGW("Dirty " RECT_STRING " doesn't intersect with 0 0 %d %d ?",</span><br><span class="line">                    SK_RECT_ARGS(dirty), width, height);</span><br><span class="line">            dirty.setEmpty();</span><br><span class="line">        &#125;</span><br><span class="line">        profiler().unionDirty(&amp;dirty);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (!dirty.isEmpty()) &#123;</span><br><span class="line">        mCanvas-&gt;prepareDirty(dirty.fLeft, dirty.fTop,</span><br><span class="line">                dirty.fRight, dirty.fBottom, mOpaque);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        mCanvas-&gt;prepare(mOpaque);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Rect outBounds;</span><br><span class="line">    mCanvas-&gt;drawRenderNode(mRootRenderNode.get(), outBounds);</span><br><span class="line"></span><br><span class="line">    profiler().draw(mCanvas);</span><br><span class="line"></span><br><span class="line">    bool drew = mCanvas-&gt;finish();</span><br><span class="line"></span><br><span class="line">    // Even if we decided to cancel the frame, from the perspective of jank</span><br><span class="line">    // metrics the frame was swapped at this point</span><br><span class="line">    mCurrentFrameInfo-&gt;markSwapBuffers();</span><br><span class="line"></span><br><span class="line">    if (drew) &#123;</span><br><span class="line">        swapBuffers(dirty, width, height);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // TODO: Use a fence for real completion?</span><br><span class="line">    mCurrentFrameInfo-&gt;markFrameCompleted();</span><br><span class="line">    mJankTracker.addFrame(*mCurrentFrameInfo);</span><br><span class="line">    mRenderThread.jankTracker().addFrame(*mCurrentFrameInfo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>uml</p>
+<p><img src="./WindowManager.png" alt=""></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/15/LayoutInflater分析/" rel="next" title="LayoutInflater分析">
+                <i class="fa fa-chevron-left"></i> LayoutInflater分析
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/25/Load-SO-from-sdcard/" rel="prev" title="Load .SO from sdcard">
+                Load .SO from sdcard <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/upload_file/tmp.jpg"
+               alt="Binea" />
+          <p class="site-author-name" itemprop="name">Binea</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">Tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#导言"><span class="nav-number">1.</span> <span class="nav-text">导言</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#WindowManagerImpl"><span class="nav-number">1.1.</span> <span class="nav-text">WindowManagerImpl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#WindowManagerGlobal"><span class="nav-number">1.2.</span> <span class="nav-text">WindowManagerGlobal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ViewRootImpl"><span class="nav-number">1.3.</span> <span class="nav-text">ViewRootImpl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#performMeasure"><span class="nav-number">1.4.</span> <span class="nav-text">performMeasure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#performLayout"><span class="nav-number">1.5.</span> <span class="nav-text">performLayout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#performDraw"><span class="nav-number">1.6.</span> <span class="nav-text">performDraw</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Binea</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

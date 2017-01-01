@@ -1,0 +1,853 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="原文
+写这篇文章的目的是为了描述我建议的Android app架构。我一步步的通过下面的原因来选择不同的组件。
+模板应用的目的很简单：它是master/detail结构，用来展示指定用户的Github仓库。虽然它简单，但它集合了一些通用的东西：
+
+使用RESTAPI  
+本地数据存储
+本地数据加载
+架构逻辑层以及页面导航
+
+让我们来看看这背后都有什么!
+###Consuming REST API">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Little stories about an Android application architecture">
+<meta property="og:url" content="http://xu6148152.github.io/2016/06/11/Little-stories-about-an-Android-application-architecture/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="原文
+写这篇文章的目的是为了描述我建议的Android app架构。我一步步的通过下面的原因来选择不同的组件。
+模板应用的目的很简单：它是master/detail结构，用来展示指定用户的Github仓库。虽然它简单，但它集合了一些通用的东西：
+
+使用RESTAPI  
+本地数据存储
+本地数据加载
+架构逻辑层以及页面导航
+
+让我们来看看这背后都有什么!
+###Consuming REST API">
+<meta property="og:updated_time" content="2016-06-11T07:59:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Little stories about an Android application architecture">
+<meta name="twitter:description" content="原文
+写这篇文章的目的是为了描述我建议的Android app架构。我一步步的通过下面的原因来选择不同的组件。
+模板应用的目的很简单：它是master/detail结构，用来展示指定用户的Github仓库。虽然它简单，但它集合了一些通用的东西：
+
+使用RESTAPI  
+本地数据存储
+本地数据加载
+架构逻辑层以及页面导航
+
+让我们来看看这背后都有什么!
+###Consuming REST API">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://xu6148152.github.io/2016/06/11/Little-stories-about-an-Android-application-architecture/"/>
+
+
+  <title> Little stories about an Android application architecture | Blog </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule" rel="section">
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Little stories about an Android application architecture
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">Veröffentlicht am</span>
+            <time itemprop="dateCreated" datetime="2016-06-11T15:59:27+08:00" content="2016-06-11">
+              2016-06-11
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://roroche.github.io/AndroidStarter/" target="_blank" rel="external">原文</a></p>
+<p>写这篇文章的目的是为了描述我建议的<code>Android app</code>架构。我一步步的通过下面的原因来选择不同的组件。</p>
+<p>模板应用的目的很简单：它是<code>master/detail</code>结构，用来展示指定用户的<code>Github</code>仓库。虽然它简单，但它集合了一些通用的东西：</p>
+<ul>
+<li>使用<code>REST</code>API  </li>
+<li>本地数据存储</li>
+<li>本地数据加载</li>
+<li>架构逻辑层以及页面导航</li>
+</ul>
+<p>让我们来看看这背后都有什么!</p>
+<p>###Consuming REST API</p>
+<blockquote>
+<p>REST Representational State Transfer表述性状态传递</p>
+</blockquote>
+<p><a href="http://square.github.io/retrofit/" target="_blank" rel="external">Retrofit</a>是开发者必备的知名网络库<br>我将解释为何我认为它是必备的库：  </p>
+<ul>
+<li>类型安全</li>
+<li>接口可读性好，采用注解<code>API</code>地址</li>
+<li>对如何工作采用完全抽象层</li>
+<li>支持多部分请求体(上传文件)</li>
+<li>使用注解直接管理头部信息</li>
+<li>能够使用多种序列化类型(<code>JSON, XML, protobuf, etc</code>)的转换器</li>
+<li>能够添加全局的请求拦截器</li>
+<li>方便的进行<code>MOCK</code>测试</li>
+</ul>
+<p>使用时仅需在<code>build.gradle</code>文件中添加</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &apos;com.squareup.retrofit:retrofit:&#123;&#123;last_version&#125;&#125;&apos;</span><br></pre></td></tr></table></figure>
+</p>
+<p>然后我能够声明<code>GitHubService</code>接口和我们需要使用这个接口的方法</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public interface GitHubService &#123;</span><br><span class="line">    @GET(&quot;/users/&#123;user&#125;/repos&quot;)</span><br><span class="line">    Call&lt;List&lt;DTORepo&gt;&gt; listRepos(@Path(&quot;user&quot;) final String psUser);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>下一步通过<code>RestAdapter</code>去实现这个接口</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">final Retrofit loRetrofit = new Retrofit.Builder()</span><br><span class="line">    .baseUrl(&quot;https://api.github.com&quot;)</span><br><span class="line">    .build();</span><br><span class="line"></span><br><span class="line">final GitHubService loService = loRetrofit.create(GitHubService.class);</span><br><span class="line">return loService;</span><br></pre></td></tr></table></figure>
+</p>
+<p>我使用<a href="https://github.com/novoda/merlin" target="_blank" rel="external">Merlin</a>。它能够观察网络的连接状态以及改变。它提供流畅<code>API</code>，设置简单。</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">final MerlinsBeard merlinsBeard = MerlinsBeard.from(context);</span><br></pre></td></tr></table></figure>
+</p>
+<p>调用</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">merlinsBeard.isConnected()</span><br></pre></td></tr></table></figure>
+</p>
+<p>来检查网络是否可用。</p>
+<p>###解析数据</p>
+<p>现在我们已经能够从服务器拿到数据了，我们需要将这些数据转换成<code>POJO</code>对象。通常的格式是<code>JSON</code>,我们使用<a href="https://github.com/FasterXML/jackson" target="_blank" rel="external">Jackson</a>来作为转换器。</p>
+<p>当然，我将会说明一下为什么我选择<code>Jackson</code>。首先，我很满意它流畅的注解<code>API</code>。能够获取或存储那些没有通过<code>@JsonProperty</code>注解声明的属性</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@JsonIgnore</span><br><span class="line">    private Map&lt;String, Object&gt; mAdditionalProperties = new HashMap&lt;String, Object&gt;();</span><br><span class="line"></span><br><span class="line">    @JsonAnyGetter</span><br><span class="line">    public Map&lt;String, Object&gt; getAdditionalProperties() &#123;</span><br><span class="line">        return mAdditionalProperties;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @JsonAnySetter</span><br><span class="line">    public void setAdditionalProperty(final String psName, final Object poValue) &#123;</span><br><span class="line">        mAdditionalProperties.put(psName, value poValue;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>与<code>Retrofit</code>组合</p>
+<p><a href="https://github.com/square/retrofit/tree/master/retrofit-converters/jackson." target="_blank" rel="external">https://github.com/square/retrofit/tree/master/retrofit-converters/jackson.</a></p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &apos;com.squareup.retrofit2:converter-jackson:&#123;&#123;last_version&#125;&#125;&apos;</span><br></pre></td></tr></table></figure>
+</p>
+<p>然后我们将其设置到我们之前的<code>RestAdapter</code></p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">final Retrofit loRetrofit = new Retrofit.Builder()</span><br><span class="line">    .baseUrl(&quot;https://api.github.com&quot;)</span><br><span class="line">    .addConverterFactory(JacksonConverterFactory.create()) // add the Jackson specific converter</span><br><span class="line">    .build();</span><br><span class="line"></span><br><span class="line">final GitHubService loService = loRetrofit.create(GitHubService.class);</span><br><span class="line">return loService;</span><br></pre></td></tr></table></figure>
+</p>
+<p>福利<br>我通常使用<a href="http://www.jsonschema2pojo.org/" target="_blank" rel="external">jsonchema2pojo</a>  </p>
+<blockquote>
+<p>Generate Plain Old Java Objects from JSON or JSON-Schema.</p>
+</blockquote>
+<p>也可以使用<a href="https://github.com/square/moshi" target="_blank" rel="external">moshi</a>或者<a href="https://github.com/bluelinelabs/LoganSquare" target="_blank" rel="external">LoganSquare</a>  </p>
+<p>####组件之间的通讯和数据传递<br>通常的做法是使用事件总线</p>
+<ul>
+<li><a href="http://square.github.io/otto/" target="_blank" rel="external">Otto</a>  </li>
+<li><a href="http://greenrobot.github.io/EventBus/" target="_blank" rel="external">EventBus</a> </li>
+<li><a href="https://github.com/beworker/tinybus" target="_blank" rel="external">TinyBus</a> </li>
+</ul>
+<blockquote>
+<p>Now can using RxJava to replace above all  </p>
+</blockquote>
+<p>####线程管理</p>
+<blockquote>
+<p>RxAndroid thread</p>
+</blockquote>
+<p>####任务管理<br>多线程和并发是开发者经常要考虑的问题。我罗列出一些不能再主线程操作的任务</p>
+<ul>
+<li>调用远程API</li>
+<li>数据库CURD操作</li>
+<li>读取本地文件</li>
+</ul>
+<p>建议采取:</p>
+<ul>
+<li>使用<code>Service</code></li>
+<li>设置<code>ServiceHelper</code>来进行网络请求</li>
+<li>使用专门的类来处理查询操作</li>
+</ul>
+<p>但需要注意的是<code>Service</code>是运行在主线程中，因此可以使用<code>IntentService</code>或者使用<a href="https://github.com/yigit/android-priority-jobqueue" target="_blank" rel="external">Android Priority Job Queue</a>或者是官方的<a href="https://developer.android.com/reference/android/app/job/JobScheduler.html" target="_blank" rel="external">JobScheduler</a></p>
+<p>####Job Manager(android-priority-jobqueue)</p>
+<p>#####Job Manager Configuration</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">final Configuration loConfiguration = new Configuration.Builder(poContext)</span><br><span class="line">    .minConsumerCount(1) // always keep at least one consumer alive</span><br><span class="line">    .maxConsumerCount(3) // up to 3 consumers at a time</span><br><span class="line">    .loadFactor(3) // 3 jobs per consumer</span><br><span class="line">    .consumerKeepAlive(120) // wait 2 minute</span><br><span class="line">    .build();</span><br><span class="line"></span><br><span class="line">final JobManager loJobManager = new JobManager(poContext, loConfiguration);</span><br></pre></td></tr></table></figure>
+</p>
+<p>#####Job Configuration<br>我们可以给一个任务设置一些有用的参数，例如</p>
+<ul>
+<li>它的优先级</li>
+<li>它是否需要网络</li>
+<li>如果不执行，是否需要持久化</li>
+<li>延时运行</li>
+<li>重试机制</li>
+</ul>
+<p>这个库的持久化引擎非常强大。例如，网络不可用时，任务会被持久化到设备上。一旦网络可用<code>JobManager</code>获取持久化的任务并执行它们</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractQuery extends Job &#123;</span><br><span class="line">    private static final String TAG = AbstractQuery.class.getSimpleName();</span><br><span class="line">    private static final boolean DEBUG = true;</span><br><span class="line"></span><br><span class="line">    protected enum Priority &#123;</span><br><span class="line">        LOW(0),</span><br><span class="line">        MEDIUM(500),</span><br><span class="line">        HIGH(1000);</span><br><span class="line">        private final int value;</span><br><span class="line"></span><br><span class="line">        Priority(final int piValue) &#123;</span><br><span class="line">            value = piValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected boolean mSuccess;</span><br><span class="line">    protected Throwable mThrowable;</span><br><span class="line">    protected AbstractEventQueryDidFinish.ErrorType mErrorType;</span><br><span class="line"></span><br><span class="line">    //region Protected constructor</span><br><span class="line">    protected AbstractQuery(final Priority poPriority) &#123;</span><br><span class="line">        super(new Params(poPriority.value).requireNetwork());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    protected AbstractQuery(final Priority poPriority, final boolean pbPersistent, final String psGroupId, final long plDelayMs) &#123;</span><br><span class="line">        super(new Params(poPriority.value).requireNetwork().setPersistent(pbPersistent).setGroupId(psGroupId).setDelayMs(plDelayMs));</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Overridden methods</span><br><span class="line">    @Override</span><br><span class="line">    public void onAdded() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onRun() throws Throwable &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            execute();</span><br><span class="line">            mSuccess = true;</span><br><span class="line">        &#125; catch (Throwable loThrowable) &#123;</span><br><span class="line">            if (BuildConfig.DEBUG &amp;&amp; DEBUG) &#123;</span><br><span class="line">                Logger.t(TAG).e(loThrowable, &quot;&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            mErrorType = AbstractEventQueryDidFinish.ErrorType.UNKNOWN;</span><br><span class="line">            mThrowable = loThrowable;</span><br><span class="line">            mSuccess = false;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        postEventQueryFinished();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void onCancel() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected int getRetryLimit() &#123;</span><br><span class="line">        return 1;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Protected abstract method for specific job</span><br><span class="line">    protected abstract void execute() throws Exception;</span><br><span class="line"></span><br><span class="line">    protected abstract void postEventQueryFinished();</span><br><span class="line"></span><br><span class="line">    public abstract void postEventQueryFinishedNoNetwork();</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<ul>
+<li>枚举描述了我需要的优先级</li>
+<li>提供两个构造函数</li>
+<li>异常处理</li>
+<li><p>默认重试次数</p>
+<p>有三个方法被实现</p>
+</li>
+<li><p><code>execute</code>: 执行特定的代码</p>
+</li>
+<li><code>postEventQueryFinished</code>: 通知任务结果</li>
+<li><p><code>postEventQueryFinishedNoNetwork</code>: 通知网络不可用</p>
+<p>后两个通常基于总线</p>
+<p>下面是我定义的抽象事件</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"> public abstract class AbstractEventQueryDidFinish&lt;QueryType extends AbstractQuery&gt; extends AbstractEvent &#123;</span><br><span class="line">    public enum ErrorType &#123;</span><br><span class="line">        UNKNOWN,</span><br><span class="line">        NETWORK_UNREACHABLE</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public final QueryType query;</span><br><span class="line"></span><br><span class="line">    public final boolean success;</span><br><span class="line">    public final ErrorType errorType;</span><br><span class="line">    public final Throwable throwable;</span><br><span class="line"></span><br><span class="line">    public AbstractEventQueryDidFinish(final QueryType poQuery, final boolean pbSuccess, final ErrorType poErrorType, final Throwable poThrowable) &#123;</span><br><span class="line">        query = poQuery;</span><br><span class="line">        success = pbSuccess;</span><br><span class="line">        errorType = poErrorType;</span><br><span class="line">        throwable = poThrowable;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+</li>
+</ul>
+<ul>
+<li>查询刚完成</li>
+<li>终端状态</li>
+<li><p>异常处理</p>
+<p>下面是我的查询用户仓库的代码</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"> public class QueryGetRepos extends AbstractQuery &#123;</span><br><span class="line">    private static final String TAG = QueryGetRepos.class.getSimpleName();</span><br><span class="line">    private static final boolean DEBUG = true;</span><br><span class="line"></span><br><span class="line">    //region Fields</span><br><span class="line">    public final String user;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Constructor matching super</span><br><span class="line">    protected QueryGetRepos(@NonNull final String psUser) &#123;</span><br><span class="line">        super(Priority.MEDIUM);</span><br><span class="line">        user = psUser;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Overridden method</span><br><span class="line">    @Override</span><br><span class="line">    protected void execute() throws Exception &#123;</span><br><span class="line">        final GitHubService gitHubService = // specific code to get GitHubService instance</span><br><span class="line"></span><br><span class="line">        final Call&lt;List&lt;DTORepo&gt;&gt; loCall = gitHubService.listRepos(user);</span><br><span class="line">        final Response&lt;List&lt;DTORepo&gt;&gt; loExecute = loCall.execute();</span><br><span class="line">        final List&lt;DTORepo&gt; loBody = loExecute.body();</span><br><span class="line"></span><br><span class="line">        // TODO deal with list of DTORepo</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void postEventQueryFinished() &#123;</span><br><span class="line">        final EventQueryGetRepos loEvent = new EventQueryGetRepos(this, mSuccess, mErrorType, mThrowable);</span><br><span class="line">        busManager.postEventOnMainThread(loEvent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void postEventQueryFinishedNoNetwork() &#123;</span><br><span class="line">        final EventQueryGetRepos loEvent = new EventQueryGetRepos(this, false, AbstractEventQueryDidFinish.ErrorType.NETWORK_UNREACHABLE, null);</span><br><span class="line">        busManager.postEventOnMainThread(loEvent);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Dedicated EventQueryDidFinish</span><br><span class="line">    public static final class EventQueryGetRepos extends AbstractEventQueryDidFinish&lt;QueryGetRepos&gt; &#123;</span><br><span class="line">        public EventQueryGetRepos(final QueryGetRepos poQuery, final boolean pbSuccess, final ErrorType poErrorType, final Throwable poThrowable) &#123;</span><br><span class="line">            super(poQuery, pbSuccess, poErrorType, poThrowable);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+</li>
+</ul>
+<p>现在，通过<code>QueryFactor</code>这个简单的代理类来进行请求</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public class QueryFactory &#123;</span><br><span class="line">    //region Build methods</span><br><span class="line">    public QueryGetRepos buildQueryGetRepos(@NonNull final String psUser) &#123;</span><br><span class="line">        return new QueryGetRepos(psUser);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Start methods</span><br><span class="line">    public void startQuery(@NonNull final Context poContext, @NonNull final AbstractQuery poQuery) &#123;</span><br><span class="line">        final Intent loIntent = new ServiceQueryExecutorIntentBuilder(poQuery).build(poContext);</span><br><span class="line">        poContext.startService(loIntent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void startQueryGetRepos(@NonNull final Context poContext, @NonNull final String psUser) &#123;</span><br><span class="line">        final QueryGetRepos loQuery = buildQueryGetRepos(psUser);</span><br><span class="line">        startQuery(poContext, loQuery);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p><code>Service</code>处理如下声明的查询:</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class ServiceQueryExecutor extends IntentService &#123;</span><br><span class="line">    private static final String TAG = ServiceQueryExecutor.class.getSimpleName();</span><br><span class="line"></span><br><span class="line">    //region Extra fields</span><br><span class="line">    AbstractQuery query;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    MerlinsBeard merlinsBeard;</span><br><span class="line">    JobManager jobManager;</span><br><span class="line"></span><br><span class="line">    //region Constructor matching super</span><br><span class="line">    /**</span><br><span class="line">     * Creates an IntentService.  Invoked by your subclass&apos;s constructor.</span><br><span class="line">     */</span><br><span class="line">    public ServiceQueryExecutor() &#123;</span><br><span class="line">        super(TAG);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Overridden methods</span><br><span class="line">    @DebugLog</span><br><span class="line">    @Override</span><br><span class="line">    protected void onHandleIntent(final Intent poIntent) &#123;</span><br><span class="line">        // TODO get AbstractQuery from Intent </span><br><span class="line">        // TODO get MerlinsBeard and JobManager instances</span><br><span class="line"></span><br><span class="line">        // If query requires network, and if network is unreachable, and if the query must not persist</span><br><span class="line">        if (query.requiresNetwork() &amp;&amp;</span><br><span class="line">                !merlinsBeard.isConnected() &amp;&amp;</span><br><span class="line">                !query.isPersistent()) &#123;</span><br><span class="line">            // then, we post an event to notify the job could not be done because of network connectivity</span><br><span class="line">            query.postEventQueryFinishedNoNetwork();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            // otherwise, we can add the job</span><br><span class="line">            jobManager.addJobInBackground(query);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>###数据持久化</p>
+<p>####ORM 方式<br>对象关系映射是软件开发中经常使用的技术</p>
+<p>####<a href="http://ormlite.com/sqlite_java_android_orm.shtml" target="_blank" rel="external">OrmLite</a><br>第一步设置要被映射的<code>POJO</code><br>我创建抽象类来匹配<code>_id</code>列</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractOrmLiteEntity &#123;</span><br><span class="line">    @DatabaseField(columnName = BaseColumns._ID, generatedId = true)</span><br><span class="line">    protected long _id;</span><br><span class="line"></span><br><span class="line">    //region Getter</span><br><span class="line">    public long getBaseId() &#123;</span><br><span class="line">        return _id;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>现在创建一个<code>POJO</code>类</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@DatabaseTable(tableName = &quot;REPO&quot;, daoClass = DAORepo.class)</span><br><span class="line">public class RepoEntity extends AbstractOrmLiteEntity &#123;</span><br><span class="line">    @DatabaseField</span><br><span class="line">    public Integer id;</span><br><span class="line"></span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String name;</span><br><span class="line"></span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String location;</span><br><span class="line"></span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String url;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>我们来看一下DAO。这个设计目的在于通过抽象的接口来访问具体的数据。</p>
+<p><code>OrmLite</code>提供了<code>Dao</code>接口以及其实现<code>BaseDaoImpl</code>。CURD所需的操作都具备。</p>
+<p>然而，这些都是同步执行的。使用<code>RxJava</code>来异步执行这些操作。</p>
+<p>因此我使用<code>RxJava</code>重写了所有的方法<br>我创建了如下接口</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public interface IRxDao&lt;T, ID&gt; extends Dao&lt;T, ID&gt;</span><br></pre></td></tr></table></figure>
+</p>
+<p>所有的方法名以”rx”为前缀。返回一个特定类型的<code>Observable</code>对象</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public abstract class RxBaseDaoImpl&lt;DataType extends AbstractOrmLiteEntity, IdType&gt; extends BaseDaoImpl&lt;DataType, IdType&gt; implements IRxDao&lt;DataType, IdType&gt;</span><br></pre></td></tr></table></figure>
+</p>
+<p>使用<code>long</code>作为ID类型</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public interface IOrmLiteEntityDAO&lt;DataType extends AbstractOrmLiteEntity&gt; extends Dao&lt;DataType, Long&gt; &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>抽象类</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractBaseDAOImpl&lt;DataType extends AbstractOrmLiteEntity&gt; extends RxBaseDaoImpl&lt;DataType, Long&gt; implements IOrmLiteEntityDAO&lt;DataType&gt; &#123;</span><br><span class="line">    //region Constructors matching super</span><br><span class="line">    protected AbstractBaseDAOImpl(final Class&lt;DataType&gt; poDataClass) throws SQLException &#123;</span><br><span class="line">        super(poDataClass);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public AbstractBaseDAOImpl(final ConnectionSource poConnectionSource, final Class&lt;DataType&gt; poDataClass) throws SQLException &#123;</span><br><span class="line">        super(poConnectionSource, poDataClass);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public AbstractBaseDAOImpl(final ConnectionSource poConnectionSource, final DatabaseTableConfig&lt;DataType&gt; poTableConfig) throws SQLException &#123;</span><br><span class="line">        super(poConnectionSource, poTableConfig);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p><code>DAORepo</code>变成</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class DAORepo extends AbstractBaseDAOImpl&lt;RepoEntity&gt; &#123;</span><br><span class="line">    //region Constructors matching super</span><br><span class="line">    public DAORepo(final ConnectionSource poConnectionSource) throws SQLException &#123;</span><br><span class="line">        this(poConnectionSource, RepoEntity.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public DAORepo(final ConnectionSource poConnectionSource, final Class&lt;RepoEntity&gt; poDataClass) throws SQLException &#123;</span><br><span class="line">        super(poConnectionSource, poDataClass);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public DAORepo(final ConnectionSource poConnectionSource, final DatabaseTableConfig&lt;RepoEntity&gt; poTableConfig) throws SQLException &#123;</span><br><span class="line">        super(poConnectionSource, poTableConfig);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p><code>ORMLite</code>提供<code>SQLiteOpenHelper</code>的抽象子类<code>OrmLiteSQLiteOpenHelper</code>。</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class DatabaseHelperAndroidStarter extends OrmLiteSqliteOpenHelper &#123;</span><br><span class="line">    private static final String DATABASE_NAME = &quot;android_starter.db&quot;;</span><br><span class="line">    private static final int DATABASE_VERSION = 1;</span><br><span class="line"></span><br><span class="line">    //region Constructor</span><br><span class="line">    public DatabaseHelperAndroidStarter(@NonNull final Context poContext) &#123;</span><br><span class="line">        super(poContext, DATABASE_NAME, null, DATABASE_VERSION);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Methods to override</span><br><span class="line">    @Override</span><br><span class="line">    @SneakyThrows(SQLException.class)</span><br><span class="line">    public void onCreate(@NonNull final SQLiteDatabase poDatabase, @NonNull final ConnectionSource poConnectionSource) &#123;</span><br><span class="line">        TableUtils.createTable(poConnectionSource, RepoEntity.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    @SneakyThrows(SQLException.class)</span><br><span class="line">    public void onUpgrade(@NonNull final SQLiteDatabase poDatabase, @NonNull final ConnectionSource poConnectionSource, final int piOldVersion, final int piNewVersion) &#123;</span><br><span class="line">        TableUtils.dropTable(poConnectionSource, RepoEntity.class, true);</span><br><span class="line">        onCreate(poDatabase, poConnectionSource);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p><code>ORMLite</code>提供<code>TableUtils</code>，其可以根据映射的类文件创建或者删除表</p>
+<p>现在，我们需要一个<code>DatabaseHelperAndroidStarter</code>来处理数据</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public DatabaseHelperAndroidStarter getDatabaseHelperAndroidStarter(@NonNull final Context poContext) &#123;</span><br><span class="line">    return new DatabaseHelperAndroidStarter(poContext);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>我们能通过下面的方式获得一个<code>DAORepo</code>实例</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public DAORepo getDAORepo(@NonNull final DatabaseHelperAndroidStarter poDatabaseHelperAndroidStarter) &#123;</span><br><span class="line">    return new DAORepo(poDatabaseHelperAndroidStarter.getConnectionSource());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>在<code>Fragment</code>中，通过以下方式获取仓库</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">private void rxGetRepos() &#123;</span><br><span class="line">    mSubscriptionGetRepos = daoRepo.rxQueryForAll()</span><br><span class="line">            .subscribeOn(Schedulers.newThread())</span><br><span class="line">            .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">            .subscribe(</span><br><span class="line">                    (final List&lt;RepoEntity&gt; ploRepos) -&gt; &#123; // onNext</span><br><span class="line">                        // TODO deal with repos</span><br><span class="line">                    &#125;,</span><br><span class="line">                    (final Throwable poException) -&gt; &#123; // onError</span><br><span class="line">                        mSubscriptionGetRepos = null;</span><br><span class="line">                        // TODO deal with error</span><br><span class="line">                    &#125;,</span><br><span class="line">                    () -&gt; &#123; // onCompleted</span><br><span class="line">                       mSubscriptionGetRepos = null;</span><br><span class="line">                    &#125;</span><br><span class="line">            );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>但仍然有个问题：如何从网络上获取一个仓库并把它解析然后存储到本地?</p>
+<p>我的目标是使用<code>DTORepo</code>来与网络通讯,<code>RepoEntity</code>映射到数据库。它们有相同名字的相同的字段。因此我需要一个工具用来把DTO转换成实体。这时候，我们会用到<a href="https://github.com/txusballesteros/android-transformer" target="_blank" rel="external">Android Transformer</a></p>
+<p>它提供两个主要的注解</p>
+<ul>
+<li><code>@Mappable</code>来代表要映射的类</li>
+<li><code>@Mapped</code>代表要映射的成员</li>
+</ul>
+<p>因此，<code>RepoEntity</code>变成:</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">@Mappable(with = DTORepo.class)</span><br><span class="line">@DatabaseTable(tableName = &quot;REPO&quot;, daoClass = DAORepo.class)</span><br><span class="line">public class RepoEntity extends AbstractOrmLiteEntity implements Serializable &#123;</span><br><span class="line">    @Mapped</span><br><span class="line">    @DatabaseField</span><br><span class="line">    public Integer id;</span><br><span class="line"></span><br><span class="line">    @Mapped</span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String name;</span><br><span class="line"></span><br><span class="line">    @Mapped</span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String location;</span><br><span class="line"></span><br><span class="line">    @Mapped</span><br><span class="line">    @DatabaseField</span><br><span class="line">    public String url;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>现在我们能通过以下方式将DTO转换成实体</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">final Transformer loTransformerRepo = new Transformer.Builder().build(RepoEntity.class);</span><br><span class="line">final RepoEntity loRepo = loTransformerRepo.transform(loDTORepo, RepoEntity.class);</span><br></pre></td></tr></table></figure>
+</p>
+<p><a href="https://github.com/stephanenicolas/ormlite-android-gradle-plugin" target="_blank" rel="external">ormgap</a>插件</p>
+<h4 id="ContentProvider方式"><a href="#ContentProvider方式" class="headerlink" title="ContentProvider方式"></a>ContentProvider方式</h4><p><code>ContentProvider</code>和<code>Cursor</code>及其派生配合使用异常强大。  </p>
+<p>使用<a href="https://github.com/TimotheeJeannin/ProviGen" target="_blank" rel="external">ProviGen</a>有以下优势：</p>
+<ul>
+<li>声明<code>ContentProvider</code>相关类方便</li>
+<li>使用<code>ProviGenProvider</code>，其是<code>ContentProvider</code>的一个子类</li>
+<li>提供<code>SQLiteOpenHelper</code>默认实现</li>
+<li>能够自定义<code>SQLiteOpenHelper</code>的实现</li>
+<li><code>TableBuilder</code>能够使用流畅的API创建<code>SQL</code>表</li>
+</ul>
+<p><a href="https://github.com/chalup/microorm" target="_blank" rel="external">MicroOrm</a></p>
+<p>###依赖注入</p>
+<p>依赖注入优点：</p>
+<ul>
+<li>便于阅读</li>
+<li>便于维护</li>
+<li><p>便于测试</p>
+<p>…</p>
+</li>
+</ul>
+<p>###MVP架构<br><a href="http://hannesdorfmann.com/mosby/" target="_blank" rel="external">文章</a><br>你能在这了解到MVP基础，VIEW状态和Loading-Content-Error</p>
+<p>另一个有用的工具是<a href="http://developer.android.com/tools/data-binding/guide.html" target="_blank" rel="external">DataBinding</a>。它能使<code>View</code>和<code>Model</code>紧密耦合，双向绑定。</p>
+<p>使用<code>Mosby</code>来解释MVP</p>
+<p>首先设计我们要展示内容的模型类</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public final class ModelRepoDetail &#123;</span><br><span class="line">    public final RepoEntity repo; // the repo to display</span><br><span class="line"></span><br><span class="line">    public ModelRepoDetail(final RepoEntity poRepo) &#123;</span><br><span class="line">        repo = poRepo;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>现在我们定义了对应的<code>View</code>接口</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public interface ViewRepoDetail extends MvpLceView&lt;ModelRepoDetail&gt; &#123;</span><br><span class="line">    void showEmpty();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>下一步是定义<code>Presenter</code></p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">@AutoInjector(ApplicationAndroidStarter.class) // to automatically add inject method in component</span><br><span class="line">public final class PresenterRepoDetail extends MvpBasePresenter&lt;ViewRepoDetail&gt; &#123;</span><br><span class="line"></span><br><span class="line">    //region Injected fields</span><br><span class="line">    @Inject</span><br><span class="line">    DAORepo daoRepo; // we need the DAO to load the repo from its ID</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Fields</span><br><span class="line">    private Subscription mSubscriptionGetRepo; // the RxJava subscription, to destroy it when needed</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Constructor</span><br><span class="line">    public PresenterRepoDetail() &#123;</span><br><span class="line">        // inject necessary fields via the component</span><br><span class="line">        ApplicationAndroidStarter.sharedApplication().componentApplication().inject(this);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Visible API</span><br><span class="line">    public void loadRepo(final long plRepoId, final boolean pbPullToRefresh) &#123;</span><br><span class="line">        if (isViewAttached()) &#123;</span><br><span class="line">            getView().showLoading(pbPullToRefresh);</span><br><span class="line">        &#125;</span><br><span class="line">        // get repo asynchronously via RxJava</span><br><span class="line">        rxGetRepo(plRepoId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void onDestroy() &#123;</span><br><span class="line">        // destroy the RxJava subscribtion</span><br><span class="line">        if (mSubscriptionGetRepo != null) &#123;</span><br><span class="line">            mSubscriptionGetRepo.unsubscribe();</span><br><span class="line">            mSubscriptionGetRepo = null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Reactive job</span><br><span class="line">    private void rxGetRepo(final long plRepoId) &#123;</span><br><span class="line">        mSubscriptionGetRepo = getDatabaseRepo(plRepoId)</span><br><span class="line">                .subscribeOn(Schedulers.newThread())</span><br><span class="line">                .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">                .subscribe(</span><br><span class="line">                        (final RepoEntity poRepo) -&gt; &#123; // onNext</span><br><span class="line">                            if (isViewAttached()) &#123;</span><br><span class="line">                                getView().setData(new ModelRepoDetail(poRepo));</span><br><span class="line">                                if (poRepo == null) &#123;</span><br><span class="line">                                    getView().showEmpty();</span><br><span class="line">                                &#125; else &#123;</span><br><span class="line">                                    getView().showContent();</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        (final Throwable poException) -&gt; &#123; // onError</span><br><span class="line">                            mSubscriptionGetRepo = null;</span><br><span class="line">                            if (isViewAttached()) &#123;</span><br><span class="line">                                getView().showError(poException, false);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;,</span><br><span class="line">                        () -&gt; &#123; // onCompleted</span><br><span class="line">                            mSubscriptionGetRepo = null;</span><br><span class="line">                        &#125;</span><br><span class="line">                );</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Database job</span><br><span class="line">    @RxLogObservable</span><br><span class="line">    private Observable&lt;RepoEntity&gt; getDatabaseRepo(final long plRepoId) &#123;</span><br><span class="line">        return daoRepo.rxQueryForId(plRepoId);</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>主要代码放在<code>rxGetRepo</code>方法中。它从数据库加载数据,然后刷新UI</p>
+<p>我们来看一下<code>FragmentRepoDetail</code></p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line">@FragmentWithArgs</span><br><span class="line">public class FragmentRepoDetail</span><br><span class="line">        extends MvpFragment&lt;ViewRepoDetail, PresenterRepoDetail&gt;</span><br><span class="line">        implements ViewRepoDetail &#123;</span><br><span class="line"></span><br><span class="line">    //region FragmentArgs</span><br><span class="line">    @Arg</span><br><span class="line">    Long mItemId;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Fields</span><br><span class="line">    private Switcher mSwitcher;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Injected views</span><br><span class="line">    @Bind(R.id.FragmentRepoDetail_TextView_Empty)</span><br><span class="line">    TextView mTextViewEmpty;</span><br><span class="line">    @Bind(R.id.FragmentRepoDetail_TextView_Error)</span><br><span class="line">    TextView mTextViewError;</span><br><span class="line">    @Bind(R.id.FragmentRepoDetail_ProgressBar_Loading)</span><br><span class="line">    ProgressBar mProgressBarLoading;</span><br><span class="line">    @Bind(R.id.FragmentRepoDetail_ContentView)</span><br><span class="line">    LinearLayout mContentView;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Data-binding</span><br><span class="line">    private FragmentRepoDetailBinding mBinding;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Default constructor</span><br><span class="line">    public FragmentRepoDetail() &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region Lifecycle</span><br><span class="line">    @Override</span><br><span class="line">    public void onCreate(final Bundle poSavedInstanceState) &#123;</span><br><span class="line">        super.onCreate(poSavedInstanceState);</span><br><span class="line">        FragmentArgs.inject(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public View onCreateView(final LayoutInflater poInflater, final ViewGroup poContainer,</span><br><span class="line">                             final Bundle savedInstanceState) &#123;</span><br><span class="line">        mBinding = DataBindingUtil.inflate(poInflater, R.layout.fragment_repo_detail, poContainer, false);</span><br><span class="line">        return mBinding.getRoot();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onViewCreated(final View poView, final Bundle poSavedInstanceState) &#123;</span><br><span class="line">        super.onViewCreated(poView, poSavedInstanceState);</span><br><span class="line"></span><br><span class="line">        ButterKnife.bind(this, poView);</span><br><span class="line"></span><br><span class="line">        mSwitcher = new Switcher.Builder()</span><br><span class="line">                .withEmptyView(mTextViewEmpty)</span><br><span class="line">                .withProgressView(mProgressBarLoading)</span><br><span class="line">                .withErrorView(mTextViewError)</span><br><span class="line">                .withContentView(mContentView)</span><br><span class="line">                .build();</span><br><span class="line"></span><br><span class="line">        loadData(false);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onDestroyView() &#123;</span><br><span class="line">        super.onDestroyView();</span><br><span class="line"></span><br><span class="line">        ButterKnife.unbind(this);</span><br><span class="line"></span><br><span class="line">        if (mBinding != null) &#123;</span><br><span class="line">            mBinding.unbind();</span><br><span class="line">            mBinding = null;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region MvpFragment</span><br><span class="line">    @Override</span><br><span class="line">    public PresenterRepoDetail createPresenter() &#123;</span><br><span class="line">        return new PresenterRepoDetail();</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region ViewRepoDetail</span><br><span class="line">    @Override</span><br><span class="line">    public void showEmpty() &#123;</span><br><span class="line">        mSwitcher.showEmptyView();</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line"></span><br><span class="line">    //region MvpLceView</span><br><span class="line">    @Override</span><br><span class="line">    public void showContent() &#123;</span><br><span class="line">        mSwitcher.showContentView();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void showLoading(final boolean pbPullToRefresh) &#123;</span><br><span class="line">        mSwitcher.showProgressView();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void showError(final Throwable poThrowable, final boolean pbPullToRefresh) &#123;</span><br><span class="line">        mSwitcher.showErrorView();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void setData(final ModelRepoDetail poData) &#123;</span><br><span class="line">        mBinding.setRepo(poData.repo);</span><br><span class="line"></span><br><span class="line">        final Activity loActivity = this.getActivity();</span><br><span class="line">        final CollapsingToolbarLayout loAppBarLayout = (CollapsingToolbarLayout) loActivity.findViewById(R.id.ActivityRepoDetail_ToolbarLayout);</span><br><span class="line">        if (loAppBarLayout != null) &#123;</span><br><span class="line">            loAppBarLayout.setTitle(poData.repo.url);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void loadData(final boolean pbPullToRefresh) &#123;</span><br><span class="line">        if (mItemId == null) &#123;</span><br><span class="line">            mSwitcher.showErrorView();</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            getPresenter().loadRepo(mItemId.longValue(), pbPullToRefresh);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    //endregion</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>当中的一些注解会在下一节中解释</p>
+<p>我们来看一下对应的布局</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;layout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">        xmlns:tools=&quot;http://schemas.android.com/tools&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;data&gt;</span><br><span class="line">        &lt;variable</span><br><span class="line">            name=&quot;repo&quot;</span><br><span class="line">            type=&quot;fr.guddy.androidstarter.database.entities.RepoEntity&quot;/&gt;</span><br><span class="line">    &lt;/data&gt;</span><br><span class="line"></span><br><span class="line">    &lt;FrameLayout</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line">        android:orientation=&quot;vertical&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;TextView</span><br><span class="line">            android:id=&quot;@+id/FragmentRepoDetail_TextView_Empty&quot;</span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line">            android:layout_height=&quot;match_parent&quot;</span><br><span class="line">            android:gravity=&quot;center&quot;</span><br><span class="line">            android:text=&quot;@string/empty_repo&quot;/&gt;</span><br><span class="line"></span><br><span class="line">        &lt;TextView</span><br><span class="line">            android:id=&quot;@+id/FragmentRepoDetail_TextView_Error&quot;</span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line">            android:layout_height=&quot;match_parent&quot;</span><br><span class="line">            android:gravity=&quot;center&quot;</span><br><span class="line">            android:text=&quot;@string/error_repo&quot;/&gt;</span><br><span class="line"></span><br><span class="line">        &lt;ProgressBar</span><br><span class="line">            android:id=&quot;@+id/FragmentRepoDetail_ProgressBar_Loading&quot;</span><br><span class="line">            style=&quot;?android:attr/progressBarStyleLarge&quot;</span><br><span class="line">            android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">            android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">            android:layout_gravity=&quot;center&quot;/&gt;</span><br><span class="line"></span><br><span class="line">        &lt;LinearLayout</span><br><span class="line">            android:id=&quot;@+id/FragmentRepoDetail_ContentView&quot;</span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line">            android:layout_height=&quot;match_parent&quot;</span><br><span class="line">            android:orientation=&quot;vertical&quot;&gt;</span><br><span class="line"></span><br><span class="line">            &lt;TextView</span><br><span class="line">                android:id=&quot;@+id/FragmentRepoDetail_TextView_Name&quot;</span><br><span class="line">                style=&quot;?android:attr/textAppearanceLarge&quot;</span><br><span class="line">                android:layout_width=&quot;match_parent&quot;</span><br><span class="line">                android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">                android:padding=&quot;16dp&quot;</span><br><span class="line">                android:text=&quot;@&#123;repo.name&#125;&quot;</span><br><span class="line">                android:textIsSelectable=&quot;true&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;TextView</span><br><span class="line">                android:id=&quot;@+id/FragmentRepoDetail_TextView_Location&quot;</span><br><span class="line">                style=&quot;?android:attr/textAppearanceMedium&quot;</span><br><span class="line">                android:layout_width=&quot;match_parent&quot;</span><br><span class="line">                android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">                android:padding=&quot;16dp&quot;</span><br><span class="line">                android:text=&quot;@&#123;repo.location&#125;&quot;</span><br><span class="line">                android:textIsSelectable=&quot;true&quot;/&gt;</span><br><span class="line"></span><br><span class="line">            &lt;TextView</span><br><span class="line">                android:id=&quot;@+id/FragmentRepoDetail_TextView_Url&quot;</span><br><span class="line">                style=&quot;?android:attr/textAppearanceSmall&quot;</span><br><span class="line">                android:layout_width=&quot;match_parent&quot;</span><br><span class="line">                android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">                android:padding=&quot;16dp&quot;</span><br><span class="line">                android:text=&quot;@&#123;repo.url&#125;&quot;</span><br><span class="line">                android:textIsSelectable=&quot;true&quot;/&gt;</span><br><span class="line">        &lt;/LinearLayout&gt;</span><br><span class="line">    &lt;/FrameLayout&gt;</span><br><span class="line">&lt;/layout&gt;</span><br></pre></td></tr></table></figure>
+</p>
+<p>多亏了MVP架构，我们收获良多</p>
+<ul>
+<li>独立的类来加载和展示对应的数据：<code>Presenter</code></li>
+<li>要展示的数据: <code>Model</code></li>
+<li>展示的方式: <code>View</code></li>
+</ul>
+<p>###写更轻量的类</p>
+<p>####注解和注解处理器的好处<br><code>android-apt</code>是<code>Android</code> 开发的一大进步。</p>
+<p>它允许开发者在<code>gradle</code>文件中配置编译时的注解处理。很多库用它来生成模板代码。</p>
+<p>####Butter Knife</p>
+<p>####FragmentArgs</p>
+<p>####IntentBuilder</p>
+<p>####Icepick</p>
+<p>####OnActivityResult</p>
+<p>####Project Lombok</p>
+<p>####Switcher</p>
+<p>###Testing<br><a href="https://github.com/ignaciotcrespo/frutilla" target="_blank" rel="external">frutilla</a>  </p>
+<p>####Fluent assertions</p>
+<ul>
+<li>truth</li>
+<li>AssertJ</li>
+<li>AssertJ Android</li>
+</ul>
+<p>####Mocking</p>
+<p>####UI testing</p>
+<p>####Code coverage</p>
+<p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">   buildTypes &#123;</span><br><span class="line">      debug &#123;</span><br><span class="line">         testCoverageEnabled = true</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</p>
+<p>###Code quality</p>
+<ul>
+<li><a href="http://checkstyle.sourceforge.net/" target="_blank" rel="external">CheckStyle</a></li>
+<li><a href="http://findbugs.sourceforge.net/" target="_blank" rel="external">FindBugs</a></li>
+<li><a href="http://pmd.github.io/" target="_blank" rel="external">PMD</a></li>
+<li><a href="http://tools.android.com/tips/lint" target="_blank" rel="external">Android Lint</a></li>
+</ul>
+<p>###Relevant libraries</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/04/analysis-recyclerview/" rel="next" title="recyclerview-structure">
+                <i class="fa fa-chevron-left"></i> recyclerview-structure
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/24/Design_pattern/" rel="prev" title="设计模式">
+                设计模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/upload_file/tmp.jpg"
+               alt="Binea" />
+          <p class="site-author-name" itemprop="name">Binea</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">Tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#ContentProvider方式"><span class="nav-number">1.</span> <span class="nav-text">ContentProvider方式</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Binea</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
