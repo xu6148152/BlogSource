@@ -1,2 +1,0 @@
-# BlogSource
-Blog source
