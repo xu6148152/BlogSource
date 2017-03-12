@@ -2290,19 +2290,106 @@ assertEquals(1, counter.get());
   1. 当调用``subscribe``时会调用离它最近的``OnSubscribe``，如果是``Operator``的话。那就会调用最近的``OnSubscribeLift``的``call``。这时``RxJavaHooks``会调用``onObserveLift``的``call``产生新的订阅者。父类``OnSubscribe``会调用这个新的订阅者，并通过``call``将这个订阅者传给父类``OnSubscribe``中，在其中给子订阅者设置生产者``setProducer``，这时生产者会调用``request``。然后会在这里将消息发给子订阅者。
   2. 线程调度: ``OperatorSubscribeOn``,将每个生产者产生的所有的数据单独放到一个``Runnable``当中运行。 ``OperatorObserveOn``则是使用队列。来一个消息往队列里面插入，并要求队列开始执行。典型的多生产者但但消费者模型。``事件产生``使用``subscribeOn``来切换线程。而且只有第一个``subscribeOn``会生效。而事件加工和消费使用``observeonOn``来切换线程。影响的是后续的``Subscriber``。
 
+### Subject
+> Subject即可做``Observable``，也可以做``Observer``.示例
+
+```java
+final TestScheduler scheduler = new TestScheduler();
+
+scheduler.advanceTimeTo(100, TimeUnit.SECONDS);
+final TestSubject<Object> subject = TestSubject.create(scheduler);
+final Observer observer = mock(Observer.class);
+subject.subscribe(observer);
+subject.onNext(1);
+scheduler.triggerActions();
+
+verify(observer, times(1)).onNext(1);
+```
+
+* ``subject``作为``Observable``发出事件
+* 默认有四种``Subject``
+
+#### AsyncSubject
+> 发出源消息的最后一个消息。必须在源消息发出``complete``之后。示例
+
+```java
+final AsyncSubject<Object> subject = AsyncSubject.create();
+final Observer observer = mock(Observer.class);
+subject.subscribe(observer);
+
+subject.onNext("first");
+subject.onNext("second");
+subject.onNext("third");
+//如果没有发出结束信号，那么AsyncSubject不会发出任何事件。反之，会发出最后一个事件
+subject.onCompleted();
+
+//observer收到最后一个事件
+verify(observer, times(1)).onNext(anyString());
+verify(observer, never()).onError(new Throwable());
+//收到结束信号
+verify(observer, times(1)).onCompleted();
+```
+
+#### BehaviorSubject
+> 发送默认值之后发送剩余的事件 示例
 
 
+```java
+final BehaviorSubject<Object> subject = BehaviorSubject.create("default");
+        final Observer observerA = mock(Observer.class);
+        final Observer observerB = mock(Observer.class);
+        final Observer observerC = mock(Observer.class);
 
+final InOrder inOrder = inOrder(observerA, observerB, observerC);
 
+subject.subscribe(observerA);
+subject.subscribe(observerB);    
 
+inOrder.verify(observerA).onNext("default");
+inOrder.verify(observerB).onNext("default");
+```
 
+* ``default``事件会先于其他事件被发出
 
+#### PublishSubject
+>发送从订阅时刻起的数据。示例
 
+```java
+final PublishSubject<Object> subject = PublishSubject.create();
+final Observer observer = mock(Observer.class);
 
+subject.onNext("one");
+subject.onNext("two");
 
+//之后发送的消息，observer才能收到
+subject.subscribe(observer);
 
+subject.onNext("three");
 
+verify(observer, never()).onNext("one");
+verify(observer, never()).onNext("two");
+verify(observer, times(1)).onNext("three");
+```
 
+#### ReplaySubject
+> 发送所有的事件，不管什么时候订阅，与PublishSubject相反。示例
 
+```java
+final ReplaySubject<Object> subject = ReplaySubject.create();
+final Observer observer = mock(Observer.class);
 
+subject.onNext("one");
+subject.onNext("two");
+
+subject.subscribe(observer);
+
+subject.onNext("three");
+
+verify(observer, times(1)).onNext("one");
+verify(observer, times(1)).onNext("two");
+verify(observer, times(1)).onNext("three");
+```
+
+### Rxjava2.0
+> 待续
 
