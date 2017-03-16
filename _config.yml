@@ -70,7 +70,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repository: https://github.com/xu6148152/xu6148152.github.io.git
+  repository: git@github.com:xu6148152/xu6148152.github.io.git
   branch: master
 
 # markdown
